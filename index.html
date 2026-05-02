@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Location Demo</title>
+</head>
+<body>
+
+<h2>Location Demo</h2>
+<p>This page will access your location (demo purpose)</p>
+
+<button onclick="getLocation()">Share Location</button>
+
+<p id="status"></p>
+
+<script>
+function getLocation() {
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+
+    const data = {
+      lat: pos.coords.latitude,
+      lon: pos.coords.longitude,
+      accuracy: pos.coords.accuracy,
+      userAgent: navigator.userAgent
+    };
+
+    document.getElementById("status").innerText = "Sending...";
+
+    await fetch("https://location-backend-127d.onrender.com/save", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(data)
+    });
+
+    document.getElementById("status").innerText = "Done!";
+  },
+  () => {
+    document.getElementById("status").innerText = "Permission denied";
+  });
+}
+</script>
+
+</body>
+</html>
