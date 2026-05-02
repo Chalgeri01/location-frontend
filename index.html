@@ -6,14 +6,16 @@
 <body>
 
 <h2>Location Demo</h2>
-<p>This page will access your location (demo purpose)</p>
+<p>This demo collects your location after your permission.</p>
 
 <button onclick="getLocation()">Share Location</button>
 
 <p id="status"></p>
 
 <script>
-function getLocation() {
+async function getLocation() {
+  document.getElementById("status").innerText = "Requesting location...";
+
   navigator.geolocation.getCurrentPosition(async (pos) => {
 
     const data = {
@@ -25,13 +27,24 @@ function getLocation() {
 
     document.getElementById("status").innerText = "Sending...";
 
-    await fetch("https://location-backend-127d.onrender.com/save", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(data)
-    });
+    try {
+      const res = await fetch("https://location-backend-127d.onrender.com/save", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+      });
 
-    document.getElementById("status").innerText = "Done!";
+      if (res.ok) {
+        document.getElementById("status").innerText =
+          `Location shared! Lat: ${data.lat}, Lon: ${data.lon}`;
+      } else {
+        document.getElementById("status").innerText = "Server error!";
+      }
+
+    } catch (err) {
+      document.getElementById("status").innerText = "Network error!";
+    }
+
   },
   () => {
     document.getElementById("status").innerText = "Permission denied";
